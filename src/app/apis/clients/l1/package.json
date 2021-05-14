@@ -1,0 +1,17 @@
+{
+  "name": "l1.client.node-js",
+  "version": "0.1.0",
+  "private": true,
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon demo"
+  },
+  "description": "L1.Client.NodeJS",
+  "devDependencies": {
+    "nodemon": "^2.0.2"
+  },
+  "dependencies": {
+    "axios": "^0.19.2",
+    "openid-client": "^3.14.0"
+  }
+}

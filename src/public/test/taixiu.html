@@ -1,0 +1,50 @@
+<!DOCTYPE HTML>
+<html lang="en-US">
+
+<head>
+    <meta charset="UTF-8">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.0.min.js"
+        integrity="sha256-xNzN2a4ltkB44Mc/Jz3pT4iU1cmeR0FkXs4pru/JxaQ=" crossorigin="anonymous"></script>
+    <title>Test Dice</title>
+    <style>
+        body {
+            background: #ddd;
+        }
+
+        #result {
+            width: 1000px;
+            word-break: break-all;
+            letter-spacing: -9px;
+            font-size: 30px;
+            line-height: 9px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Random 10000 times <button onClick="window.location.href = window.location.href;">Re-random</button></h1>
+    <h1>Tài: &#9726 Xỉu: &#x25FD;</h1>
+
+    <div id="result">Loading</div>
+</body>
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        axios.get('/api/testdice?taixiu=true')
+            .then(function (response) {
+                // handle success
+                $('#result').empty().append(response.data);
+            })
+            .catch(function (error) {
+                // handle error
+                console.log(error);
+            })
+            .then(function () {
+                // always executed
+            });
+
+    });
+</script>
+
+</html>
