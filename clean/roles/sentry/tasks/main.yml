@@ -1,0 +1,6 @@
+---
+- name: Copy teamplate scripts
+  template:
+    src: templates/sentry.sh.j2
+    dest: /var/scripts/sentry.sh
+  become: yes

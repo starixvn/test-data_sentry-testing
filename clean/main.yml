@@ -1,0 +1,10 @@
+---
+- hosts: all
+  roles:
+    - role: sentry
+  tags: clean-log-sentry
+
+- hosts: all
+  roles:
+    - role: gitlab
+  tags: clean-log-gitlab

@@ -1,0 +1,4 @@
+#!/bin/bash
+export sentry_web=$(docker ps -aqf "name=^sentry_sentry-web")
+#echo $sentry_web
+docker exec -t $sentry_web sentry cleanup --days 7
