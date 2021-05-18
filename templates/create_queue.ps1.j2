@@ -1,0 +1,9 @@
+$queue_names = Get-Content "{{script_location}}\msqueue.txt"
+[System.Reflection.Assembly]::LoadWithPartialName("System.Messaging") | Out-Null
+foreach($queue_name in $queue_names)
+{
+	write-host "creating queue $queue_name";
+	$qb = [System.Messaging.MessageQueue]::Create(".\private$\$queue_name")
+	$qb.SetPermissions("Everyone",[System.Messaging.MessageQueueAccessRights]::FullControl,[System.Messaging.AccessControlEntryType]::Set)
+	$qb.SetPermissions("ANONYMOUS LOGON",[System.Messaging.MessageQueueAccessRights]::FullControl,[System.Messaging.AccessControlEntryType]::Set)
+}

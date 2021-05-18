@@ -1,0 +1,13 @@
+$mimetype_array = ".asx",".doc",".csv",".asi"
+foreach ($mimetype in )
+if (!(Get-WebConfigurationProperty //staticContent -Name collection[fileExtension="$mime"])) 
+{ 
+    Write-Host "$mime doesn't exist"
+
+}
+else
+{
+Write-Host "$mime existed"
+}
+
+add-webconfigurationproperty //staticContent -name collection -value @{fileExtension='.xpa'; mimeType='application/octet-stream'} 

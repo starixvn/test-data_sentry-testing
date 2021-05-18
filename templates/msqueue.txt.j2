@@ -1,0 +1,25 @@
+{%if env=='local' %}
+12bettrans
+agencytrans
+alphatrans
+emailservice
+entlib
+fdmessagequeue
+fpstrans
+fpstrans2
+mayfairtrans
+owp
+{%endif%}
+{%if env=='uat' %}
+entlib
+fanexemailservice
+fdmessagequeue
+fsmessagequeue
+mailservice
+{%endif%}
+{%if env=='prod' %}
+entlib
+fanexemailservice
+fdmessagequeue
+fsmessagequeue
+{%endif%}

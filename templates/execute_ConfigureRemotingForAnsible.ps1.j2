@@ -1,0 +1,8 @@
+$computerName = Get-Content "{{script_location}}\newserver.txt"
+foreach($computer in $computerName)
+{
+	$realhostname = (gwmi win32_operatingsystem -computer $computer).csname
+	write-host "executing script ConfigureRemotingForAnsible.ps1 on $realhostname ($computer) ..."
+	invoke-command -computer $realhostname -filepath "{{script_location}}\configureRemotingForAnsible.ps1"
+	write-host "->done execute ConfigureRemotingForAnsible.ps1 on $realhostname ($computer) !"
+}
