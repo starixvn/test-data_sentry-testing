@@ -1,0 +1,25 @@
+version: '3.5'
+
+services:
+  agent:
+    image: registry.nexdev.net:5050/docker/nexops-tools/portainer:agent #portainer/agent
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/lib/docker/volumes:/var/lib/docker/volumes
+    ports:
+      - target: 9001
+        published: 9001
+        protocol: tcp
+        mode: host
+    networks:
+      - {{swarm_network_nexops}}
+    environment:
+      AGENT_SECRET: {{portainer_agent_secret}}
+    deploy:
+      mode: global
+      placement:
+        constraints: [node.platform.os == linux]
+
+networks:
+  {{swarm_network_nexops}}:
+     external: true

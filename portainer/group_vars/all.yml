@@ -1,0 +1,9 @@
+portainer_admin_port: 9000
+portainer_tunnel_port: 8000
+portainer_gfs_subdir: portainer
+portainer_network_name: portainer_agent_network
+portainer_volume_name: portainer_data
+portainer_app_name: portainer
+portainer_admin_password: password1234
+portainer_agent_secret: mysecrettoken
+gluster_path: /var/www/gluster/nexops

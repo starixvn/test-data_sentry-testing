@@ -1,0 +1,35 @@
+---
+- name: Verify stacks directory exists (on first swarm node)
+  when: inventory_hostname in groups['swarm_managers']
+  file:
+    path: "/home/{{ansible_user}}/stacks"
+    state: directory
+
+- name: Create portainer directory
+  file:
+    path: "{{gluster_path}}/portainer"
+    mode: "0755"
+    state: directory
+  become: yes
+
+- name: Create network
+  docker_network:
+    name: "{{swarm_network_nexops}}"
+    driver: "overlay"
+    attachable: true
+  ignore_errors: yes
+  become: yes
+
+- name: Copy docker-compose file
+  #when: inventory_hostname == groups['swarm_managers'][0]
+  template:
+    src: "templates/docker-compose.yml.j2"
+    dest: /home/{{ansible_user}}/stacks/portainer-stack.yml
+  become: yes
+
+- name: Build up and run container
+  #when: inventory_hostname == groups['swarm_managers'][0]
+  shell: |
+    cd /home/{{ansible_user}}/stacks
+    docker stack deploy --compose-file=portainer-stack.yml portainer
+  become: yes
