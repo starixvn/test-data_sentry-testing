@@ -1,0 +1,44 @@
+########################################################################
+# File managed by Ansible - NexOps
+# Your changes will be overwritten.
+#######################################################################
+version: "3.3"
+services:
+  nginx_{{site_name}}:
+    container_name: "{{site_name}}"
+    image: regdocker.nexdev.net/dev/nginx:{{nginx_version | default('1.19.1')}}
+    build:
+      context: .
+      dockerfile: conf/Dockerfile
+    restart: {{restart_mode | default('always')}}
+    ports:
+{%if port80 is defined and port80=='no' %}  
+      - "{{site_port}}:{{site_port}}"
+{%else %}
+      - "{{site_port}}:80"
+{%endif%}
+    volumes:
+{%if volume_name is defined%} 
+      - {{volume_name}}:/usr/share/nginx
+      - ./conf/nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./logs:/var/log/nginx/
+{%else %}
+      - {{web_path | default('./app')}}:/usr/share/nginx
+      - ./conf/nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./logs:/var/log/nginx/
+{%endif%}
+{%if whitelist is defined and whitelist=='yes'%}
+      - ./conf/whitelist.conf:/etc/nginx/whitelist.conf
+{%endif%}
+    networks:
+      - frontend_nic
+
+networks:
+  frontend_nic:
+    external:
+      name: frontend_nic
+{%if volume_name is defined%} 
+volumes:
+  {{ volume_name }}:
+    external: true
+{%endif%}

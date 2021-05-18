@@ -1,0 +1,42 @@
+########################################################################
+# File managed by Ansible - NexOps
+# Your changes will be overwritten.
+#######################################################################
+version: "3.3"
+services:
+  app_{{site_name}}:
+    container_name: "{{site_name}}"
+{% if dotnet_version is defined %}
+    image: regdocker.nexdev.net/dev/netcore-{{img_name | lower}}:{{dotnet_version}}
+{%endif%}
+{% if nodejs_version is defined %}
+    image: regdocker.nexdev.net/dev/nodejs:{{nodejs_version}}
+{%endif%}
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: {{restart_mode | default('always')}}
+    networks:
+      - backend_nic
+    ports:
+{%if port80 is defined and port80=='no' %}  
+      - "{{site_port}}:{{site_port}}"
+{%else %}
+      - "{{site_port}}:80"
+{%endif%}
+    volumes:
+{%if volume_name is defined%} 
+      - {{volume_name}}:/app
+{%else %}
+      - {{web_path | default('./app')}}:/app
+{%endif%}
+
+networks:
+  backend_nic:
+    external:
+      name: backend_nic
+{%if volume_name is defined%} 
+volumes:
+  {{ volume_name }}:
+    external: true
+{%endif%}

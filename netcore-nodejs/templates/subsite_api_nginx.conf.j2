@@ -1,0 +1,190 @@
+upstream webapi_v1 {
+    server webapp_v1:{{proxy_port| default('80')}};
+}
+upstream webapi_v2 {
+    server webapp_v2:{{proxy_port| default('80')}};
+}
+upstream webapi_v3 {
+    server webapp_v3:{{proxy_port| default('80')}};
+}
+{%if total_site is defined and total_site >3 %}
+upstream webapi_v4 {
+    server webapp_v4:{{proxy_port| default('80')}};
+}
+upstream webapi_v5 {
+    server webapp_v5:{{proxy_port| default('80')}};
+}
+{%endif%}
+{%if total_site is defined and total_site >5 %}
+upstream webapi_v6 {
+    server webapp_v6:{{proxy_port| default('80')}};
+}
+upstream webapi_v7 {
+    server webapp_v7:{{proxy_port| default('80')}};
+}
+upstream webapi_v8 {
+    server webapp_v8:{{proxy_port| default('80')}};
+}
+upstream webapi_v9 {
+    server webapp_v9:{{proxy_port| default('80')}};
+}
+upstream webapi_v10 {
+    server webapp_v10:{{proxy_port| default('80')}};
+}
+{%endif%}
+server {
+    listen {{site_port}};
+    access_log  /var/log/nginx/{{site_name | lower}}.access.log;
+	error_log  /var/log/nginx/{{site_name | lower}}.error.log;
+
+	#site1
+	location /v1/ {
+	proxy_pass http://webapi_v1/;
+    proxy_http_version 1.1;
+	proxy_set_header   Upgrade $http_upgrade;
+	proxy_set_header   Connection {{ Site_Connection | default('keep-alive')}};
+	proxy_set_header   Host $host;
+	proxy_set_header X-Forwarded-Host $host:$server_port;
+	proxy_cache_bypass $http_upgrade;
+	proxy_set_header   X-Forwarded-For $proxy_add_x_forwarded_for;
+	proxy_set_header   X-Forwarded-Proto $scheme;
+	client_max_body_size    10m;
+	client_body_buffer_size 128k;
+	}
+	#site2
+	location /v2/ {
+	proxy_pass http://webapi_v2/;
+    proxy_http_version 1.1;
+	proxy_set_header   Upgrade $http_upgrade;
+	proxy_set_header   Connection {{ Site_Connection | default('keep-alive')}};
+	proxy_set_header   Host $host;
+	proxy_set_header X-Forwarded-Host $host:$server_port;
+	proxy_cache_bypass $http_upgrade;
+	proxy_set_header   X-Forwarded-For $proxy_add_x_forwarded_for;
+	proxy_set_header   X-Forwarded-Proto $scheme;
+	client_max_body_size    10m;
+	client_body_buffer_size 128k;
+	}
+	#site3
+	location /v3/ {
+	proxy_pass http://webapi_v3/;
+    proxy_http_version 1.1;
+	proxy_set_header   Upgrade $http_upgrade;
+	proxy_set_header   Connection {{ Site_Connection | default('keep-alive')}};
+	proxy_set_header   Host $host;
+	proxy_set_header X-Forwarded-Host $host:$server_port;
+	proxy_cache_bypass $http_upgrade;
+	proxy_set_header   X-Forwarded-For $proxy_add_x_forwarded_for;
+	proxy_set_header   X-Forwarded-Proto $scheme;
+	client_max_body_size    10m;
+	client_body_buffer_size 128k;
+	}
+	######
+	{%if total_site is defined and total_site >3 %}
+	#site4
+	location /v4/ {
+	proxy_pass http://webapi_v4/;
+    proxy_http_version 1.1;
+	proxy_set_header   Upgrade $http_upgrade;
+	proxy_set_header   Connection {{ Site_Connection | default('keep-alive')}};
+	proxy_set_header   Host $host;
+	proxy_set_header X-Forwarded-Host $host:$server_port;
+	proxy_cache_bypass $http_upgrade;
+	proxy_set_header   X-Forwarded-For $proxy_add_x_forwarded_for;
+	proxy_set_header   X-Forwarded-Proto $scheme;
+	client_max_body_size    10m;
+	client_body_buffer_size 128k;
+	}
+	#site5
+	location /v5/ {
+	proxy_pass http://webapi_v5/;
+    proxy_http_version 1.1;
+	proxy_set_header   Upgrade $http_upgrade;
+	proxy_set_header   Connection {{ Site_Connection | default('keep-alive')}};
+	proxy_set_header   Host $host;
+	proxy_set_header X-Forwarded-Host $host:$server_port;
+	proxy_cache_bypass $http_upgrade;
+	proxy_set_header   X-Forwarded-For $proxy_add_x_forwarded_for;
+	proxy_set_header   X-Forwarded-Proto $scheme;
+	client_max_body_size    10m;
+	client_body_buffer_size 128k;
+	}
+	{%endif%}
+	######
+	{%if total_site is defined and total_site >5 %}
+	#site6
+	location /v6/ {
+	proxy_pass http://webapi_v6/;
+    proxy_http_version 1.1;
+	proxy_set_header   Upgrade $http_upgrade;
+	proxy_set_header   Connection {{ Site_Connection | default('keep-alive')}};
+	proxy_set_header   Host $host;
+	proxy_set_header X-Forwarded-Host $host:$server_port;
+	proxy_cache_bypass $http_upgrade;
+	proxy_set_header   X-Forwarded-For $proxy_add_x_forwarded_for;
+	proxy_set_header   X-Forwarded-Proto $scheme;
+	client_max_body_size    10m;
+	client_body_buffer_size 128k;
+	}
+
+	location /v7/ {
+	proxy_pass http://webapi_v7/;
+    proxy_http_version 1.1;
+	proxy_set_header   Upgrade $http_upgrade;
+	proxy_set_header   Connection {{ Site_Connection | default('keep-alive')}};
+	proxy_set_header   Host $host;
+	proxy_set_header X-Forwarded-Host $host:$server_port;
+	proxy_cache_bypass $http_upgrade;
+	proxy_set_header   X-Forwarded-For $proxy_add_x_forwarded_for;
+	proxy_set_header   X-Forwarded-Proto $scheme;
+	client_max_body_size    10m;
+	client_body_buffer_size 128k;
+	}
+
+	location /v8/ {
+	proxy_pass http://webapi_v8/;
+    proxy_http_version 1.1;
+	proxy_set_header   Upgrade $http_upgrade;
+	proxy_set_header   Connection {{ Site_Connection | default('keep-alive')}};
+	proxy_set_header   Host $host;
+	proxy_set_header X-Forwarded-Host $host:$server_port;
+	proxy_cache_bypass $http_upgrade;
+	proxy_set_header   X-Forwarded-For $proxy_add_x_forwarded_for;
+	proxy_set_header   X-Forwarded-Proto $scheme;
+	client_max_body_size    10m;
+	client_body_buffer_size 128k;
+	}
+
+	location /v9/ {
+	proxy_pass http://webapi_v9/;
+    proxy_http_version 1.1;
+	proxy_set_header   Upgrade $http_upgrade;
+	proxy_set_header   Connection {{ Site_Connection | default('keep-alive')}};
+	proxy_set_header   Host $host;
+	proxy_set_header X-Forwarded-Host $host:$server_port;
+	proxy_cache_bypass $http_upgrade;
+	proxy_set_header   X-Forwarded-For $proxy_add_x_forwarded_for;
+	proxy_set_header   X-Forwarded-Proto $scheme;
+	client_max_body_size    10m;
+	client_body_buffer_size 128k;
+	}
+
+	location /v10/ {
+	proxy_pass http://webapi_v10/;
+    proxy_http_version 1.1;
+	proxy_set_header   Upgrade $http_upgrade;
+	proxy_set_header   Connection {{ Site_Connection | default('keep-alive')}};
+	proxy_set_header   Host $host;
+	proxy_set_header X-Forwarded-Host $host:$server_port;
+	proxy_cache_bypass $http_upgrade;
+	proxy_set_header   X-Forwarded-For $proxy_add_x_forwarded_for;
+	proxy_set_header   X-Forwarded-Proto $scheme;
+	client_max_body_size    10m;
+	client_body_buffer_size 128k;
+	}
+	{%endif%}
+    location /whoami {
+	      default_type text/plain;
+	      return 200 "SITE: {{site_name}} \nSERVER IP: Physical IP - {{ ansible_default_ipv4.address }} | Container IP - $server_addr \nSERVER FWD IP: $proxy_add_x_forwarded_for \nPUBLIC PORT: {{site_port}}\nProxy PORT: {{proxy_port|default('80')}}\nProject Path: {%if volume_name is defined%} /var/lib/docker/volumes/{{site_name}}/_data {%else %} {{working_directory}}/v1/app, {{working_directory}}/v2/app, {{working_directory}}/v3/app {%endif%}";
+	}
+}

@@ -1,0 +1,32 @@
+- name: Testing ansible
+  hosts: all
+  gather_facts: true
+
+  tasks:
+    - name: Inspect images
+      docker_image_info:
+        name: "{{docker_image}}:{{version}}"
+      register: result
+      become: yes
+    - debug:
+        var: result
+      become: yes
+
+    - name: Check local image
+      command: >
+        echo "docker images {{docker_image}}:{{version}}" | grep -v grep | grep {{docker_image}} | grep {{version}}
+      register: check_result
+
+    - name: master image exists
+      command: echo "Image exits..."
+      when: check_result | bool
+
+    - name: master image does exit
+      command: echo "Image does exit..."
+      when: not check_result | bool
+
+    - name: Make sure that images {{docker_image}}:{{version}} exist locally
+      assert:
+        that:
+          - result.images | length == 1
+      become: yes

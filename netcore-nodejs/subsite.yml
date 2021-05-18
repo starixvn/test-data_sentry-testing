@@ -1,0 +1,57 @@
+---
+- name: Creating network interface if not existed...
+  shell: |
+    docker network ls|grep frontend_nic > /dev/null || docker network create --driver bridge frontend_nic
+    docker network ls|grep backend_nic > /dev/null || docker network create --driver bridge backend_nic
+  become: yes
+      
+- name: Check and create docker volume {{volume_name | default('logs')}} if not existed...
+  shell: |
+    docker volume ls|grep {{volume_name | default('logs')}} > /dev/null || docker volume create {{volume_name | default('logs')}}
+  become: yes
+
+- name: "create working directory {{ working_directory }}"
+  file:
+    path: '{{ working_directory }}'
+    mode: '0755'
+    state: directory
+  become: yes
+
+- name: create working Site
+  file:
+    path: '{{ working_directory }}/{{ item }}'
+    mode: '0777'
+    state: directory
+  become: yes
+  with_items:
+    - v1/app
+    - v2/app
+    - v3/app
+    - v4/app
+    - v5/app
+    - v6/app
+    - v7/app
+    - v8/app
+    - v9/app
+    - v10/app
+    - conf
+    - logs
+
+#Log into Nexcel private registry and force re-authorization
+## Dockerfile ##
+- name: cp Dockerfile template
+  template:
+    src: 'templates/Dockerfile.j2'
+    #dest: "/etc/nginx/conf.d/"
+    dest: "{{ working_directory }}/Dockerfile"
+  become: yes
+
+- name: cp docker-compose template
+  template:
+    src: 'templates/subsite_docker-compose.yml.j2'
+    #dest: "/etc/nginx/conf.d/"
+    dest: "{{ working_directory }}/docker-compose.yml"
+  become: yes
+  #tags:
+  #  - create-site
+  #  - create-subsite

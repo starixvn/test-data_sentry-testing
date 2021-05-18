@@ -1,0 +1,69 @@
+#site1
+server {
+    listen {{site_port1}};
+    access_log  /var/log/nginx/{{site_name | lower}}_{{site_port1}}.access.log;
+	error_log  /var/log/nginx/{{site_name | lower}}_{{site_port1}}.error.log;
+	location / {
+	proxy_pass http://webapp_v1:{{proxy_port| default('80')}}/;
+    proxy_http_version 1.1;
+	proxy_set_header   Upgrade $http_upgrade;
+	proxy_set_header   Connection {{ Site_Connection | default('keep-alive')}};
+	proxy_set_header   Host $host;
+	proxy_set_header X-Forwarded-Host $host:$server_port;
+	proxy_cache_bypass $http_upgrade;
+	proxy_set_header   X-Forwarded-For $proxy_add_x_forwarded_for;
+	proxy_set_header   X-Forwarded-Proto $scheme;
+	client_max_body_size    10m;
+	client_body_buffer_size 128k;
+		}
+		location /whoami {
+	      default_type text/plain;
+	      return 200 "SITE: {{site_name | lower}}_{{site_port1}}:\nSERVER IP: $server_addr\nSERVER FWD IP: $proxy_add_x_forwarded_for\nPUBLIC PORT: {{site_port1}}\Proxy PORT: {{proxy_port|default('80')}}\nProject Path: {%if volume_name is defined%} /var/lib/docker/volumes/{{site_name}}/_data {%else %} {{working_directory}}/v1/app{%endif%}";
+		}
+	}
+	#site2
+server {
+    listen {{site_port2}};
+    access_log  /var/log/nginx/{{site_name | lower}}_{{site_port2}}.access.log;
+	error_log  /var/log/nginx/{{site_name | lower}}_{{site_port2}}.error.log;
+	location / {
+	proxy_pass http://webapp_v2:{{proxy_port| default('80')}}/;
+    proxy_http_version 1.1;
+	proxy_set_header   Upgrade $http_upgrade;
+	proxy_set_header   Connection {{ Site_Connection | default('keep-alive')}};
+	proxy_set_header   Host $host;
+	proxy_set_header X-Forwarded-Host $host:$server_port;
+	proxy_cache_bypass $http_upgrade;
+	proxy_set_header   X-Forwarded-For $proxy_add_x_forwarded_for;
+	proxy_set_header   X-Forwarded-Proto $scheme;
+	client_max_body_size    10m;
+	client_body_buffer_size 128k;
+		}
+		location /whoami {
+	      default_type text/plain;
+	      return 200 "SITE: {{site_name | lower}}_{{site_port1}}:\nSERVER IP: $server_addr\nSERVER FWD IP: $proxy_add_x_forwarded_for\nPUBLIC PORT: {{site_port2}}\Proxy PORT: {{proxy_port|default('80')}}\nProject Path: {%if volume_name is defined%} /var/lib/docker/volumes/{{site_name}}/_data {%else %} {{working_directory}}/v2/app{%endif%}";
+		}
+	}
+	#site3
+server {
+    listen {{site_port3}};
+    access_log  /var/log/nginx/{{site_name | lower}}_{{site_port3}}.access.log;
+	error_log  /var/log/nginx/{{site_name | lower}}_{{site_port3}}.error.log;
+	location / {
+	proxy_pass http://webapp_v3:{{proxy_port| default('80')}}/;
+    proxy_http_version 1.1;
+	proxy_set_header   Upgrade $http_upgrade;
+	proxy_set_header   Connection {{ Site_Connection | default('keep-alive')}};
+	proxy_set_header   Host $host;
+	proxy_set_header X-Forwarded-Host $host:$server_port;
+	proxy_cache_bypass $http_upgrade;
+	proxy_set_header   X-Forwarded-For $proxy_add_x_forwarded_for;
+	proxy_set_header   X-Forwarded-Proto $scheme;
+	client_max_body_size    10m;
+	client_body_buffer_size 128k;
+		}
+		location /whoami {
+	      default_type text/plain;
+	      return 200 "SITE: {{site_name | lower}}_{{site_port1}}:\nSERVER IP: $server_addr\nSERVER FWD IP: $proxy_add_x_forwarded_for\nPUBLIC PORT: {{site_port3}}\Proxy PORT: {{proxy_port|default('80')}}\nProject Path: {%if volume_name is defined%} /var/lib/docker/volumes/{{site_name}}/_data {%else %} {{working_directory}}/v3/app{%endif%}";
+		}
+	}

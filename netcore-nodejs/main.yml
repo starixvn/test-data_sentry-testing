@@ -1,0 +1,184 @@
+- name: Running task to create application containers
+  hosts: all
+  gather_facts: true
+
+  tasks:
+
+    - name: Creating site...
+      include: site.yml
+      tags:
+        - create-nginx-netcore
+        - create-nginx-nodejs
+        - create-staticsite
+        - create-netcore
+        - create-nodejs
+    - name: Creating Subsite...
+      include: subsite.yml
+      tags:
+        - create-subsite
+##### Dockerfile - Docker-compose
+    - name: cp docker-compose Nginx-App template
+      template:
+        src: 'templates/nginx-app-docker-compose.yml.j2'
+        #dest: "/etc/nginx/conf.d/"
+        dest: "{{ working_directory }}/docker-compose.yml"
+      become: yes
+      tags:
+        - create-nginx-netcore
+        - create-nginx-nodejs
+        - create-staticsite
+
+    - name: cp docker-compose App template
+      template:
+        src: 'templates/app-docker-compose.yml.j2'
+        #dest: "/etc/nginx/conf.d/"
+        dest: "{{ working_directory }}/docker-compose.yml"
+      become: yes
+      tags:
+        - create-netcore
+        - create-nodejs
+
+    - name: cp docker-compose Nginx template
+      template:
+        src: 'templates/nginx-docker-compose.yml.j2'
+        #dest: "/etc/nginx/conf.d/"
+        dest: "{{ working_directory }}/docker-compose.yml"
+      become: yes
+      tags:
+        - create-staticsite
+
+    - name: Prepare Dockerfile for Netcore image
+      become: yes
+      blockinfile:
+        dest: "{{ working_directory }}/Dockerfile"
+        insertafter: '#dockerfile'
+        marker: "# {mark} -- created Netcore by Ansible"
+        #FROM mcr.microsoft.com/dotnet/core/sdk:{{dotnet_version}}
+        block: |
+          FROM regdocker.nexdev.net/dev/aspnet:{{dotnet_version}}
+          WORKDIR /app
+          RUN sed -i 's/DEFAULT@SECLEVEL=2/DEFAULT@SECLEVEL=1/g' /etc/ssl/openssl.cnf
+          RUN sed -i 's/MinProtocol = TLSv1.2/MinProtocol = TLSv1/g' /etc/ssl/openssl.cnf
+          RUN sed -i 's/DEFAULT@SECLEVEL=2/DEFAULT@SECLEVEL=1/g' /usr/lib/ssl/openssl.cnf
+          RUN sed -i 's/MinProtocol = TLSv1.2/MinProtocol = TLSv1/g' /usr/lib/ssl/openssl.cnf
+          ENTRYPOINT ["dotnet", "{{app_dll}}"]
+      tags:
+        - create-nginx-netcore
+        - create-netcore
+        - create-subsite
+
+    - name: Prepare Dockerfile for NodeJS image
+      become: yes
+      blockinfile:
+        dest: "{{ working_directory }}/Dockerfile"
+        insertafter: '#dockerfile'
+        marker: "# {mark} -- created NodeJS by Ansible"
+        #          FROM node:{{nodejs_version}}
+        #          #regdocker.nexdev.net/dev/node:{{nodejs_version}} #node:{{nodejs_version}} | regdocker.nexdev.net/dev/nodejs-{{img_name | lower}}:{{nodejs_version}}
+        block: |
+          FROM {{private_img | default('node')}}:{{nodejs_version}}
+          WORKDIR /app
+          EXPOSE {{proxy_port| default('80')}}
+          CMD [ "node", {{cmd_nodejs | default('')}}"--max-old-space-size={{memory_nodejs | default('2048')}}", "{{app_js| default('server.js')}}" ]
+      tags:
+        - create-nginx-nodejs
+        - create-nodejs
+
+##### Dockerfile
+##### Nginx cfg
+    - name: cp nginx dockerfile template
+      template:
+        src: 'templates/nginx_Dockerfile.j2'
+        #dest: "/etc/nginx/conf.d/"
+        dest: "{{ working_directory }}/conf/Dockerfile"
+      become: yes
+      tags:
+        - create-nginx-netcore
+        - create-nginx-nodejs
+        - create-staticsite
+        - create-subsite
+
+    - name: cp whitelist.conf template
+      template:
+        src: "templates/whitelist.conf.j2"
+        dest: "{{ working_directory }}/conf/whitelist.conf"
+      tags:
+        - create-nginx-netcore
+        - create-nginx-nodejs
+        - create-staticsite
+        - create-subsite
+        - whitelist
+      become: yes
+
+    - name: cp site conf template
+      template:
+        src: 'templates/site_nginx.conf.j2'
+        dest: "{{ working_directory }}/conf/nginx.conf"
+      become: yes
+      tags:
+        - create-nginx-netcore
+        - create-nginx-nodejs
+
+    - name: cp staticsite conf template
+      template:
+        src: 'templates/static_site_nginx.conf.j2'
+        dest: "{{ working_directory }}/conf/nginx.conf"
+      become: yes
+      tags:
+        - create-staticsite
+      ignore_errors: true
+
+    - name: cp subsite conf of webapi template
+      template:
+        src: 'templates/subsite_api_nginx.conf.j2'
+        dest: "{{ working_directory }}/conf/nginx.conf"
+      become: yes
+      tags:
+        - webapi
+
+    - name: cp subsite conf of website template
+      template:
+        src: 'templates/subsite_nginx.conf.j2'
+        #dest: "/etc/nginx/conf.d/"
+        dest: "{{ working_directory }}/conf/nginx.conf"
+      become: yes
+      tags:
+        - website
+##### Nginx cfg
+##### Docker build and run containers
+    - name: Build up with latest Dockerfile
+      shell: |
+        cd {{ working_directory }}
+        docker-compose pull | true && docker-compose build
+      become: yes
+      ignore_errors: true
+      tags:
+        - create-nginx-netcore
+        - create-nginx-nodejs
+        - create-netcore
+        - create-nodejs
+        - create-subsite
+
+    - name: Creating container by docker-compose...
+      shell: |
+        cd {{ working_directory }}
+        docker-compose up -d
+      become: yes
+      #docker-compose --compatibility up -d
+      tags:
+        - create-nginx-netcore
+        - create-nginx-nodejs
+        - create-staticsite
+        - create-netcore
+        - create-nodejs
+        - create-subsite
+
+    - name: Restart containers
+      shell: |
+        cd {{ working_directory }}
+        docker-compose restart
+      become: yes
+      tags:
+        - restart-containers
+        - whitelist
+##### Docker build and run container
