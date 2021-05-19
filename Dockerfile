@@ -23,3 +23,5 @@ COPY ./src .
 HEALTHCHECK --interval=10s CMD node healthcheck.js
 
 CMD [ "node", "./server.js" ]
+
+gfsgfdgfdg
