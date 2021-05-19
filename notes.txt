@@ -3,3 +3,4 @@ export http_proxy="http://10.40.40.245:3128" && export https_proxy="http://10.40
 sudo usermod -a -G docker zabbix
 service zabbix-agent2 restart
 fsadsdsgf
+dss
